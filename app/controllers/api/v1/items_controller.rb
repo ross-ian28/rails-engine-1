@@ -19,11 +19,11 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def update
-    item = Item.find(params[:id])
-    if item.update(item_params)
+    item = Item.update(params[:id], item_params)
+    if item.save
       render json: ItemSerializer.format_item(item)
     else
-      flash[:alert] = "Try again"
+      render status: 404
     end
   end
 
