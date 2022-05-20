@@ -80,20 +80,20 @@ RSpec.describe "Item API" do
     expect(item.name).to_not eq(previous_name)
     expect(item.name).to eq("Elucidator")
   end
-  xit "cant edit fake merchant" do
+  it "cant edit fake merchant" do
     merchant = create(:merchant)
-    id = create(:item, merchant_id: merchant.id).id
+    item = create(:item, merchant_id: merchant.id)
 
-    item_params = {merchant_id: 28}
+    item_params = {merchant_id: merchant.id + 1}
     headers = {"CONTENT_TYPE" => "application/json"}
 
-    put "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+    put "/api/v1/items/#{item.id}", headers: headers, params: JSON.generate({item: item_params})
 
-    expect(response).to be_successful
-    expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    expect(response).to_not be_successful
   end
   it "deletes an item" do
-    item = create(:item)
+    merch = create(:merchant)
+    item = create(:item, merchant_id: merch.id)
 
     expect(Item.count).to eq(1)
 
@@ -104,7 +104,8 @@ RSpec.describe "Item API" do
     expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
   end
   it "deletes an item" do
-    item = create(:item)
+    merch = create(:merchant)
+    item = create(:item, merchant_id: merch.id)
 
     expect { delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
 
